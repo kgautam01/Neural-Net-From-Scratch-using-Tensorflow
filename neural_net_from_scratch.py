@@ -137,7 +137,7 @@ class model(model):
 
       for epoch in range(epochs):
         epoch_cost = 0.
-        m = x_train.shape[1]
+        m = x_train.shape[1]    #Number of examples
         num_minibatches = m//mini_batch_size
         mini_batches = self.random_mini_batches(x_train, y_train,
                                            mini_batch_size)
@@ -168,50 +168,15 @@ class model(model):
       #test_accuracy = tf.reduce_mean(tf.cast(correct_prediction_test, "float"))
       print("Test Accuracy: {:.3f}".format(accuracy.eval({x: x_test, y: y_test})))
 
-  '''def predict(self, X):
-    Z = self.forward_pass_test(X)
-    return (tf.nn.softmax(Z), axis=1).eval()
-  def accuracy(self, predictions, labels):
-    correct_prediction = tf.equal(tf.argmax(predictions), tf.argmax(labels))
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-    return accuracy'''
   def predict(self, x):
     Z = self.forward_pass_test(x)
     return tf.argmax(tf.nn.softmax(Z), axis = 1)
 
 (x_train, y_train), (x_test, y_test) = load_data()
-model = model([784, 512, 256, 128, 10])
+model = model([784, 512, 256, 128, 10])     
+# First and last index above, represents the input and output layer dimensions respectively. 
+# Rest are hidden layer dimensions. Any number of hidden layers can be added. Just make sure
+# to make changes in the calculations of 'regularizers' in compute_cost function.
 model.info()
 
 model.train(x_train.T, y_train.T, x_test.T, y_test.T)
-
-def plot_random_examples(x, y, p=None):
-    indices = np.random.choice(range(0, x.shape[0]), 10)
-    y = np.argmax(y, axis=1)
-    if p is None:
-        p = y
-    plt.figure(figsize=(10, 5))
-    for i, index in enumerate(indices):
-        plt.subplot(2, 5, i+1)
-        plt.imshow(x[index].reshape((28, 28)), cmap='binary')
-        plt.xticks([])
-        plt.yticks([])
-        if y[index] == p[index]:
-            col = 'g'
-        else:
-            col = 'r'
-        plt.xlabel(str(p[index]), color=col)
-    return plt
-
-preds = tf.nn.softmax(model.forward_pass_test(tf.convert_to_tensor(x_test, dtype = tf.float32)))
-with tf.Session() as sess:
-  preds.eval()
-
-plot_random_examples(x_test, y_test).show()
-
-print(model.W1)
-
-class model(model):
-  def display(self):
-    return self.W
-
